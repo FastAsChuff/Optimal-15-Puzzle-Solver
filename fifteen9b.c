@@ -160,14 +160,10 @@ uint32_t cmn15_linearconflicts2(uint64_t boardA, uint64_t boardB) {
 }
 #endif
 
-
 uint32_t cmn15_boardzeropos(uint64_t board) {
-  uint64_t mask;
-  mask = (board & 0x5555555555555555ULL) | ((board & 0xaaaaaaaaaaaaaaaaULL) >> 1);
-  mask = (mask & 0x3333333333333333ULL) | ((mask & 0xccccccccccccccccULL) >> 2);
-  mask |= (mask << 1);
-  mask |= (mask << 2);
-  return __builtin_ctzll(~mask) / 4;
+  board |= board >> 1;
+  board |= board >> 2;
+  return __builtin_ctzll(~board & 0x1111111111111111ULL) / 4;
 }
 
 _Bool cmn15_pathleneven(uint64_t boardA, uint64_t boardB) {
@@ -1444,7 +1440,7 @@ int main(int argc, char*argv[]) {
   }
   //printf("%u steps. (%lu+%lu=%lu heuristic evals.)\n", minsteps, hevalsF, hevalsR, hevalsF+hevalsR);
   printf("%u steps. (%lu heuristic evals.)\n", minsteps, hevalsF+hevalsR);
-  if (endtime > starttime) printf("Approx. %f heuristic evals./s", (float)(hevalsF+hevalsR)/(endtime - starttime));
+  if (endtime > starttime) printf("Approx. %f heuristic evals./s\n", (float)(hevalsF+hevalsR)/(endtime - starttime));
   //boardA = cmn15_randomboard(boardB);
   //boardB = cmn15_randomboard(boardA);
   //pathleneven = cmn15_pathleneven(boardA, boardB);
@@ -1471,12 +1467,15 @@ From 0123456789abcdef
   80 moves fe8cab9d26513740 
 */
 /*
-time ./fifteen9.bin 159d26ae37bf48c0 123456789abcdef0
-72 steps. (4492027048 heuristic evals.) 
-real	43m56.468s (A10 2.5GHz laptop)
+time ./fifteen9b.bin 159d26ae37bf48c0 123456789abcdef0
+72 steps. (2601335425 heuristic evals.)
+Approx. 1758847.625000 heuristic evals./s
+real	24m40.032s (A10 2.5GHz laptop)
 
-time ./fifteen9.bin fe8cab9d26513740 0123456789abcdef
-80 steps. (627885509 heuristic evals.)
-real	6m34.141s
+time ./fifteen9b.bin fe8cab9d26513740 0123456789abcdef
+80 steps. (194131032 heuristic evals.)
+Approx. 1848867.000000 heuristic evals./s
+real	1m45.964s  (A10 2.5GHz laptop)
+
 
 */
